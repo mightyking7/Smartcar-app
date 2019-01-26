@@ -11,11 +11,20 @@ CORS(app)
 access = None
 
 # TODO: Authorization Step 1a: Launch Smartcar authorization dialog
+client = smartcar.AuthClient(
+    client_id=os.environ.get('CLIENT_ID'),
+    client_secret=os.environ.get('CLIENT_SECRET'),
+    redirect_uri=os.environ.get('REDIRECT_URI'),
+    scope=['read_vehicle_info'],
+    test_mode=True,
+)
 
 
 @app.route('/login', methods=['GET'])
 def login():
     # TODO: Authorization Step 1b: Launch Smartcar authorization dialog
+    auth_url = client.get_auth_url()
+    return redirect(auth_url)
 
     pass
 
