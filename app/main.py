@@ -1,4 +1,4 @@
-import smartcar
+import smartcar 
 from flask import Flask, redirect, request, jsonify
 from flask_cors import CORS
 
@@ -6,6 +6,12 @@ import os
 
 app = Flask(__name__)
 CORS(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
+
+
 
 # global variable to save our access_token
 access = None
@@ -13,8 +19,8 @@ access = None
 client = smartcar.AuthClient(
     client_id ='ae64785d-d7ab-4c00-a039-e4916cc9cec2',
     client_secret = 'df10e885-51d7-4f22-9b1e-4186c501f172',
-    redirect_uri = 'http://localhost:8000/exchange',
-    scope=['read_vehicle_info'],
+    redirect_uri = 'https://smartcar-app-229900.appspot.com/exchange',
+    scope=['read_vehicle_info', 'read_location'],
     test_mode=True
     )
 
@@ -36,8 +42,8 @@ def exchange():
     access = client.exchange_code(code)
     return '', 200
 
-@app.route('/location', methods=['GET'])
-def location():
+# used to archive the longitude and latitude in the MySQL database
+def logLocation():
     # access our global variable to retrieve our access tokens
     global access
     # the list of vehicle ids
@@ -45,10 +51,16 @@ def location():
         access['access_token'])['vehicles']
     
     # instantiate the first vehicle in the vehicle id list
-    car1 = smartcar.Vehicle(vehicle_ids[0], access['access_token'])
-    loc = car1.location()
-
-    return jsonify(loc)
+    vehicle = smartcar.Vehicle(vehicle_ids[0], access['access_token'])
+    location = vehicle.location()
+    latitude = location["data"]["latitude"]
+           longitude = location["data"]["longitude"]
+           timestamp = location["age"]
+           print(latitude, longitude, timestamp)
+           data = csv.writer(f)
+           data.writerow([latitude, longitude, timestamp])
+           time.sleep(2)
+    
 
 @app.route('/vehicle', methods=['GET'])
 def vehicle():

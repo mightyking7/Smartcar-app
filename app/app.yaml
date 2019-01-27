@@ -1,0 +1,23 @@
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /.*
+  script: main.app
+
+libraries:
+- name: flask
+  version: 0.12
+- name: ssl
+  version: latest
+
+  env_variables:
+    # Replace user, password, database, and instance connection name with the values obtained
+    # when configuring your Cloud SQL instance.
+    SQLALCHEMY_DATABASE_URI: >-
+      mysql+pymysql://root:securePassword$23@/geo_locations?unix_socket=/cloudsql/smartcar-app-229900:us-central1:smartcar-app
+
+      beta_settings:
+    cloud_sql_instances: smartcar-app-229900:us-central1:smartcar-app
+  
