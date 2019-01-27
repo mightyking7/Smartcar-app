@@ -11,12 +11,12 @@ CORS(app)
 access = None
 
 client = smartcar.AuthClient(
-    client_id=os.environ.get('CLIENT_ID'),
-    client_secret=os.environ.get('CLIENT_SECRET'),
-    redirect_uri=os.environ.get('REDIRECT_URI'),
+    client_id ='ae64785d-d7ab-4c00-a039-e4916cc9cec2',
+    client_secret = 'df10e885-51d7-4f22-9b1e-4186c501f172',
+    redirect_uri = 'http://localhost:8000/exchange',
     scope=['read_vehicle_info'],
     test_mode=True
-)
+    )
 
 
 @app.route('/login', methods=['GET'])
@@ -49,6 +49,7 @@ def vehicle():
     vehicle = smartcar.Vehicle(vehicle_ids[0], access['access_token'])
 
     info = vehicle.info()
+
     print(info)
 
     return jsonify(info)
