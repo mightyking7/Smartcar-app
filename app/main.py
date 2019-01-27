@@ -14,7 +14,7 @@ client = smartcar.AuthClient(
     client_id=os.environ.get('CLIENT_ID'),
     client_secret=os.environ.get('CLIENT_SECRET'),
     redirect_uri=os.environ.get('REDIRECT_URI'),
-    scope=['read_vehicle_info'],
+    scope=['read_location','read_vehicle_info'],
     test_mode=True
 )
 
@@ -36,6 +36,19 @@ def exchange():
     access = client.exchange_code(code)
     return '', 200
 
+@app.route('/location', methods=['GET'])
+def location():
+    # access our global variable to retrieve our access tokens
+    global access
+    # the list of vehicle ids
+    vehicle_ids = smartcar.get_vehicle_ids(
+        access['access_token'])['vehicles']
+    
+    # instantiate the first vehicle in the vehicle id list
+    car1 = smartcar.Vehicle(vehicle_ids[0], access['access_token'])
+    loc = car1.location()
+
+    return jsonify(loc)
 
 @app.route('/vehicle', methods=['GET'])
 def vehicle():
@@ -52,7 +65,6 @@ def vehicle():
     print(info)
 
     return jsonify(info)
-
 
 if __name__ == '__main__':
     app.run(port=8000)
